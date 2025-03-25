@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>GRID Player</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #000 !important;
+      color: #00ffff;
+    }
+    /* Update progress bar styles */
+    .progress-container {
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 20px 0;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #00ffff;
+      border-radius: 3px;
+      width: 0;
+      transition: width 0.1s linear;
+    }
+    #visualizerCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+    .player-ui {
+      position: relative;
+      z-index: 1;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    }
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      justify-content: center;
+    }
+    button {
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      color: #6bc7c2;
+      padding: 12px 25px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button:hover {
+      background: rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    }
+    #playlist {
+      list-style: none;
+      padding: 0;
+      margin-top: 30px;
+    }
+    .track-item {
+      padding: 15px;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .track-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateX(10px);
+    }
+    .track-item.playing {
+      background: rgba(0, 255, 255, 0.1);
+      border-left: 4px solid #00ffff;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .custom-file-input {
+      display: inline-block;
+      padding: 12px 25px;
+      cursor: pointer;
+      border-radius: 8px;
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+    .custom-file-input:hover {
+      background: rgba(0, 255, 255, 0.2);
+    }
+
+    .feather {
+  width: 24px;
+  height: 24px;
+  stroke: #00ffff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+  </style>
+  <!-- Load Feather Icons from CDN -->
+  <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+</head>
+<body>
+  <canvas id="visualizerCanvas"></canvas>
+  
+  <div class="player-ui">
+    <h1 style="color: #00ffff; text-align: center; margin-bottom: 30px;">GRID MUSIC</h1>
+    
+    <label class="custom-file-input">
+      <input type="file" id="fileInput" accept="audio/*" multiple>
+      Select Tracks
+    </label>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="controls">
+        <button id="playPause">
+          <i data-feather="play" class="feather-icon"></i>
+        </button>
+        <button id="stop">
+          <i data-feather="square" class="feather-icon"></i>
+        </button>
+      </div>
+      
+
+    <ul id="playlist"></ul>
+  </div>
+
+  <!-- Three.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    // Ensure Feather Icons are replaced when the DOM is loaded
+    document.addEventListener("DOMContentLoaded", () => {
+      feather.replace();
+      initVisualizer();
+    });
+
+    const audioPlayer = new Audio();
+    
+    let scene, camera, renderer, analyser, dataArray;
+    let audioContext, source;
+    let isVisualizing = false;
+
+    // Initialize Three.js Scene for visualizer
+    function initVisualizer() {
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      renderer = new THREE.WebGLRenderer({ 
+          antialias: true, 
+          canvas: document.querySelector('#visualizerCanvas'),
+          alpha: false 
+      });
+      renderer.setClearColor(0x000000); // Black background
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      
+      // Create particles
+      const particles = new THREE.BufferGeometry();
+      const particleCount = 5000;
+      const posArray = new Float32Array(particleCount * 3);
+      for(let i = 0; i < particleCount * 3; i++) {
+          posArray[i] = (Math.random() - 0.5) * 5;
+      }
+      particles.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      
+      const material = new THREE.PointsMaterial({
+          size: 0.005,
+          color: '#00ffff'
+      });
+      const particleMesh = new THREE.Points(particles, material);
+      scene.add(particleMesh);
+      
+      camera.position.z = 2;
+      animateParticles(particleMesh);
+    }
+
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    let isSeeking = false;
+
+    // Update progress bar as audio plays
+    audioPlayer.addEventListener('timeupdate', () => {
+      if (!isSeeking) {
+          const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+          progressBar.style.width = `${progress}%`;
+      }
+    });
+
+    // Handle seeking on progress bar
+    progressContainer.addEventListener('mousedown', () => {
+      isSeeking = true;
+    });
+    progressContainer.addEventListener('mouseup', (e) => {
+      seek(e);
+      isSeeking = false;
+    });
+    progressContainer.addEventListener('mousemove', (e) => {
+      if (isSeeking) {
+          seek(e);
+      }
+    });
+    function seek(e) {
+      const rect = progressContainer.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      audioPlayer.currentTime = pos * audioPlayer.duration;
+      progressBar.style.width = `${pos * 100}%`;
+    }
+
+    // Animate particles based on frequency data
+    function animateParticles(particleMesh) {
+      const positions = particleMesh.geometry.attributes.position.array;
+      function animate() {
+        requestAnimationFrame(animate);
+        if(analyser && dataArray) {
+          analyser.getByteFrequencyData(dataArray);
+          for(let i = 0; i < positions.length; i += 3) {
+            positions[i + 1] += dataArray[i % dataArray.length] * 0.0001;
+            if(positions[i + 1] > 2.5) positions[i + 1] = -2.5;
+          }
+          particleMesh.geometry.attributes.position.needsUpdate = true;
+        }
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    // Setup audio and visualizer analysis
+    const fileInput = document.getElementById('fileInput');
+    const playlist = document.getElementById('playlist');
+    let tracks = [];
+    let currentTrackIndex = 0;
+
+    fileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      tracks = files.map(file => ({
+        name: file.name,
+        url: URL.createObjectURL(file)
+      }));
+      updatePlaylist();
+      if(tracks.length > 0) playTrack(0);
+    });
+
+    function updatePlaylist() {
+      playlist.innerHTML = tracks.map((track, index) => `
+          <li class="track-item ${index === currentTrackIndex ? 'playing' : ''}">
+              ${track.name}
+          </li>
+      `).join('');
+      document.querySelectorAll('.track-item').forEach((item, index) => {
+          item.addEventListener('click', () => playTrack(index));
+      });
+    }
+
+    function playTrack(index) {
+      if(!tracks[index]) return;
+      currentTrackIndex = index;
+      audioPlayer.src = tracks[index].url;
+      audioPlayer.play();
+      setupAudioAnalysis();
+      updatePlaylist();
+    }
+
+    function setupAudioAnalysis() {
+      if(!audioContext) {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          analyser = audioContext.createAnalyser();
+          analyser.fftSize = 256;
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
+      }
+      if(source) source.disconnect();
+      source = audioContext.createMediaElementSource(audioPlayer);
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      if(!isVisualizing) {
+          initVisualizer();
+          isVisualizing = true;
+      }
+    }
+
+    // Controls for play/pause and stop buttons
+    document.getElementById('playPause').addEventListener('click', () => {
+      if(audioPlayer.paused) {
+        audioPlayer.play();
+      } else {
+        audioPlayer.pause();
+      }
+    });
+    document.getElementById('stop').addEventListener('click', () => {
+      audioPlayer.pause();
+      audioPlayer.currentTime = 0;
+    });
+    audioPlayer.addEventListener('play', () => {
+  document.getElementById('playPause').innerHTML = '<i data-feather="pause" class="feather-icon"></i>';
+  window.replaceIcons();
+});
+
+audioPlayer.addEventListener('pause', () => {
+  document.getElementById('playPause').innerHTML = '<i data-feather="play" class="feather-icon"></i>';
+  window.replaceIcons();
+});
+    audioPlayer.addEventListener('ended', () => {
+      currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+      playTrack(currentTrackIndex);
+    });
+
+    // Handle window resize for Three.js renderer
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+  <script src="renderer.js"></script>
+</body>
+</html>

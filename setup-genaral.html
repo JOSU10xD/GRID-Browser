@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html style="background-color: #000;">
+<head>
+  <meta charset="UTF-8">
+  <title>General Settings - GRID Browser</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+    }
+    .container {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+    .background {
+      position: absolute;
+      top: 0; 
+      left: 0; 
+      right: 0; 
+      bottom: 0;
+      background: url('assets/animated_background.gif') no-repeat center center;
+      background-size: cover;
+      z-index: 1;
+    }
+    .overlay {
+      position: relative;
+      z-index: 2;
+      padding: 20px 20px 50px 20px; /* Extra bottom padding */
+      height: calc(100% - 50px); /* Leave gap at the bottom */
+    }
+    .title-bar {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      margin-bottom: 20px;
+      -webkit-app-region: drag;
+      padding: 0 10px;
+    }
+    .title-bar img {
+      height: 32px;
+      width: 32px;
+      margin-right: 10px;
+    }
+    .title-bar span {
+      font-size: 24px;
+    }
+    .content {
+      display: flex;
+      height: calc(100% - 68px);
+      margin-right: 20px; /* Gap from right border */
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      width: 100%;
+      max-width: 800px;
+    }
+    .left-panel {
+      min-width: 370px;
+      min-height: 370px;
+      border-radius: 10px;
+      background: url('assets/default.png') no-repeat center center;
+      background-size: cover;
+    }
+    .right-panel {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-right: 20px; /* Extra gap */
+    }
+    .right-panel .setting {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #555;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.5); /* Semi-transparent */
+    }
+    .setting label {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    .setting select,
+    .setting input[type="text"] {
+      padding: 5px;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 5px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #222;
+      color: #fff;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 18px;
+      border: none;
+      border-radius: 4px;
+      background: #353535;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body style="background-color: #000;">
+  <div class="container">
+    <div class="background"></div>
+    <div class="overlay">
+      <div class="title-bar">
+        <img src="assets/algemeen.png" alt="General Icon">
+        <span>BROWSER <span style="font-weight:300; font-size:22px;">SETTINGS</span></span>
+      </div>
+      <div class="content">
+        <div class="grid">
+          <div class="left-panel"></div>
+          <div class="right-panel">
+            <div class="setting">
+              <label for="searchEngine">Search Engine:</label>
+              <select id="searchEngine">
+                <option value="https://www.google.com/search?q=" selected>Google</option>
+                <option value="https://www.ask.com/web?q=">Ask</option>
+                <option value="https://www.baidu.com/s?wd=">Baidu</option>
+                <option value="https://www.bing.com/search?q=">Bing</option>
+                <option value="https://www.duckduckgo.com/?q=">DuckDuckGo</option>
+                <option value="https://www.ecosia.org/search?q=">Ecosia</option>
+                <option value="https://www.startpage.com/search?q=">Startpage</option>
+                <option value="https://www.qwant.com/?q=">Qwant</option>
+                <option value="https://lite.qwant.com/?q=">Qwant Lite</option>
+                <option value="https://search.yahoo.com/search?p=">Yahoo!</option>
+                <option value="https://presearch.com/search?q=">Presearch</option>
+              </select>
+            </div>
+            <div class="setting">
+              <label for="openNew">Open Links in New Tab:</label>
+              <select id="openNew">
+                <option value="0" selected>No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+            <button id="genNextBtn">Setup General</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    
+    function updateGeneralSettings() {
+      const searchEngineSelect = document.getElementById('searchEngine');
+      const openNewSelect = document.getElementById('openNew');
+      const genSettings = {
+        engineFriendlyName: searchEngineSelect.options[searchEngineSelect.selectedIndex].text,
+        searchUrl: searchEngineSelect.value,
+        openTabHandle: openNewSelect.value
+      };
+      ipcRenderer.send('update-general-settings', genSettings);
+    }
+    
+    document.getElementById('searchEngine').addEventListener('change', updateGeneralSettings);
+    document.getElementById('openNew').addEventListener('change', updateGeneralSettings);
+    
+    document.getElementById('genNextBtn').addEventListener('click', () => {
+      updateGeneralSettings();
+      document.body.style.opacity = 0;
+      setTimeout(() => {
+        window.location.href = "setup-privacy.html";
+      }, 500);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grid Browser</title>
+  <style>
+    /* Reset and basic styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
+    /* Custom Title Bar */
+    #titlebar {
+      height: 30px;
+      background-color: rgb(36, 36, 36);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      -webkit-app-region: drag;
+      padding-left: 10px;
+      position: relative;
+    }
+    #titlebar .app-info {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    #titlebar .app-info img {
+      height: 20px;
+      margin-right: 8px;
+    }
+    #titlebar .app-info span {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    #titlebar .window-controls {
+      position: absolute;
+      right: 0;
+      top: 0;
+      display: flex;
+      -webkit-app-region: no-drag;
+    }
+    #titlebar .window-controls button {
+      background: none;
+      border: none;
+      color: #fff;
+      width: 45px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #titlebar .window-controls button:hover {
+      background-color: rgba(51,51,51,0.8);
+    }
+    /* Main Container */
+    #main-container {
+      display: flex;
+      height: calc(100% - 30px);
+      width: 100%;
+    }
+    /* Sidebar styling */
+    #sidebar {
+      width: 230px;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      transition: width 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+      overflow: hidden;
+    }
+    #sidebar.hidden {
+      width: 0;
+      opacity: 0;
+      padding: 0;
+    }
+    /* Toolbar inside sidebar with rows */
+    #sidebar .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    /* Row containers */
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    /* Row 1: More, Back, Forward, Reload */
+    .row.row1 button {
+  flex: 1;
+  margin: 5px 5px;
+  padding: 5px;
+  border: none;
+  border-radius: 11px;
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.3),
+        0 0 10px rgba(0, 255, 255, 0.5),
+        inset 0 0 5px rgba(0, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.row.row1 button:hover,
+.row.row3 button:hover,
+.row.row4 button:hover,
+.bottom-buttons button:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
+    box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.5),
+        0 0 15px rgba(0, 255, 255, 0.7),
+        inset 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+    /* Row 2: Searchbar and Home */
+    .row.row2 {
+      margin: 5px 0;
+      gap: 5px;
+      align-items: center;
+    }
+    .row.row2 input[type="text"] {
+    flex: 1;
+    max-width: calc(100% - 50px);
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    height: 40px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.3), /* Inner cyan border */
+        0 0 10px rgba(0, 255, 255, 0.5),   /* Outer glow */
+        inset 0 0 5px rgba(0, 255, 255, 0.2); /* Inner glow */
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* Hover Effect */
+.row.row2 input[type="text"]:hover {
+    box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.5),
+        0 0 15px rgba(0, 255, 255, 0.7),
+        inset 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+/* Focus Effect (when clicked/typing) */
+.row.row2 input[type="text"]:focus {
+    background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+        0 0 0 2px rgba(0, 255, 255, 0.8),
+        0 0 20px rgba(0, 255, 255, 1),
+        inset 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+/* Placeholder Styling */
+.row.row2 input[type="text"]::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+    .row.row2 button {
+      padding: 0px 10px;
+      border: none;
+      border-radius: 13px;
+      background-color: transparent;
+      color: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.3),
+        0 0 10px rgba(0, 255, 255, 0.5),
+        inset 0 0 5px rgba(0, 255, 255, 0.2);
+    transition: all 0.3s ease;
+      height: 35px;
+}
+
+.row.row2 button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
+    box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.5),
+        0 0 15px rgba(0, 255, 255, 0.7),
+        inset 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+    /* Row 3 and Row 4: Three buttons each */
+    .row.row3, .row.row4 {
+      justify-content: space-between;
+    }
+    .row.row3 button,
+.row.row4 button {
+  flex: 1;
+  margin: 0 10px;
+  padding: 8px;
+  border: none;
+  border-radius: 13px;
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.3),
+        0 0 10px rgba(0, 255, 255, 0.5),
+        inset 0 0 5px rgba(0, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.row.row1 button:focus,
+.row.row2 button:focus,
+.row.row3 button:focus,
+.row.row4 button:focus,
+.bottom-buttons button:focus {
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 0 0 2px rgba(0, 255, 255, 0.8),
+        0 0 20px rgba(0, 255, 255, 1),
+        inset 0 0 10px rgba(0, 255, 255, 0.4);
+    outline: none;
+}
+    /* Unhide method selection (sidebar) */
+    .unhide-method {
+      margin-top: 8px;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+    .unhide-method label {
+      margin-right: 10px;
+    }
+    /* Separator line */
+    .separator {
+      margin: 10px 5px;
+      border: none;
+      border-top: 1px solid #555;
+    }
+    /* Bottom Buttons: New Tab and Hide Sidebar */
+    .bottom-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .bottom-buttons button {
+  display: flex; /* Align icon and text properly */
+  align-items: center; /* Vertically center items */
+  justify-content: center; /* Center contents horizontally */
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.3),
+        0 0 10px rgba(0, 255, 255, 0.5),
+        inset 0 0 5px rgba(0, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  gap: 8px; /* Adds spacing between the icon and text */
+}
+
+.bottom-buttons button:hover {
+  transform: scale(1.1);
+  filter: brightness(1.3);
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+
+.bottom-buttons button i {
+  display: flex; /* Ensures the icon is properly aligned */
+  align-items: center;
+  justify-content: center;
+  font-size: 18px; /* Adjust size if necessary */
+  stroke-width: 2px; /* Ensures visibility */
+}
+    /* Tabs section styling */
+    #tabsSection {
+      flex: 1;
+      margin-top: 10px;
+      padding: 5px;
+      overflow-y: overlay;
+    }
+    #tabsSection::-webkit-scrollbar {
+  width: 6px; /* Total width of scrollbar */
+}
+
+#tabsSection::-webkit-scrollbar-track {
+  background: transparent; /* Fully transparent track */
+}
+
+#tabsSection::-webkit-scrollbar-thumb {
+  background: rgba(126, 125, 125, 0.4);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+#tabsSection::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.6);
+}
+
+#tabsSection::-webkit-scrollbar-corner {
+  background: transparent; /* Remove corner filler */
+}
+
+
+  .tab-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  min-height: 40px;
+  margin-bottom: 5px;
+  background-color: rgba(48, 48, 48, 0.8);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tab-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+}
+
+.tab-item.drag-over-top {
+  border-top: 2px solid #00ffff;
+  box-shadow: 0 -4px 10px rgba(0, 255, 255, 0.3);
+}
+
+.tab-item.drag-over-bottom {
+  border-bottom: 2px solid #00ffff;
+  box-shadow: 0 4px 10px rgba(0, 255, 255, 0.3);
+}
+.tab-item:hover {
+  filter: brightness(1.3);
+  box-shadow: 0 4px 10px rgba(255, 255, 255, 0.2);
+}
+    .tab-item.active {
+      background-color: rgb(19,19,19);
+    }
+    .tab-title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .tab-close {
+      font-size: 20px;
+      margin-left: 5px;
+      padding: 2px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .tab-close:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    /* Style for favicon inside a tab */
+    .tab-item img.favicon {
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
+      border-radius: 2px;
+    }
+    /* Webview container */
+    #webview-container {
+      flex: 1;
+      transition: width 0.3s;
+      position: relative;
+      background: #fff;
+    }
+    #webview {
+      width: 100%;
+      height: 100%;
+    }
+    /* Hover Zone Overlay (for Mouse Hover method) */
+    #hover-zone {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3%;
+      height: 100%;
+      background: transparent;
+      pointer-events: none;
+      z-index: 5;
+    }
+    /* Sidebar Toggle Arrow (for Arrow Button method) */
+    #sidebar-toggle-arrow {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 20px;
+      height: 40px;
+      background-color: rgba(0,0,0,0.5);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transform: translateY(-50%);
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+      transition: opacity 0.3s;
+      opacity: 0;
+      z-index: 10;
+    }
+    #sidebar.hidden.arrow-visible + #webview-container #sidebar-toggle-arrow {
+      opacity: 1;
+    }
+
+    /* Flyout container */
+    #moreBtn {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#moreBtn.active {
+  transform: rotate(90deg);
+  filter: brightness(1.5);
+}
+
+/* Enhanced Flyout Design */
+.flyout {
+  position: absolute;
+  top: 45px;
+  left: 10px;
+  width: 280px;
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 8px;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flyout.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.flyout-content {
+  padding: 12px 0;
+}
+
+/* Flyout User Section */
+.flyout-user .user-info {
+  padding: 12px 16px;
+  background: rgba(0, 255, 255, 0.05);
+  margin-bottom: 8px;
+}
+
+.user-picture {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 255, 0.3);
+}
+
+.username {
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.account-type {
+  font-size: 12px;
+  color: rgba(0, 255, 255, 0.7);
+}
+
+/* Flyout Buttons */
+.flyout-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.flyout-btn i {
+  width: 20px;
+  margin-right: 12px;
+  stroke: rgba(0, 255, 255, 0.8);
+}
+
+.flyout-btn:hover {
+  background: rgba(0, 255, 255, 0.08);
+  padding-left: 20px;
+}
+
+.flyout-btn:hover i {
+  stroke: #00ffff;
+}
+
+.flyout-separator {
+  border-color: rgba(0, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+/* Flyout Entrance Animation */
+@keyframes flyoutEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+  </style>
+</head>
+<body>
+  <!-- Custom Title Bar -->
+  <div id="titlebar">
+    <div class="app-info">
+      <img src="assets/gridlogo.png" alt="Logo">
+      <span>Grid</span>
+    </div>
+    <div class="window-controls">
+      <button id="minimizeBtn"><i data-feather="minus" style="stroke: cyan;"></i></button>
+      <button id="maximizeBtn"><i data-feather="maximize" style="stroke: cyan;"></i></button>
+      <button id="closeBtn"><i data-feather="x" style="stroke: cyan;"></i></button>
+    </div>
+  </div>
+  <!-- Main Container -->
+  <div id="main-container">
+    <!-- Sidebar -->
+    <div id="sidebar">
+      <div class="toolbar">
+        <!-- Row 1: More, Back, Forward, Reload -->
+        <div class="row row1">
+          <button id="moreBtn"><i data-feather="more-horizontal" style="stroke: cyan;"></i></button>
+          <button id="backBtn"><i data-feather="chevron-left" style="stroke: cyan;"></i></button>
+          <button id="forwardBtn"><i data-feather="chevron-right" style="stroke: cyan;"></i></button>
+          <button id="reloadBtn"><i data-feather="rotate-cw" style="stroke: cyan;"></i></button>
+        </div>
+        <!-- Row 2: Searchbar and Home -->
+        <div class="row row2">
+          <input type="text" id="addressBar" placeholder="Enter URL or search query">
+          <button id="homeBtn"><i data-feather="home" style="stroke: cyan;"></i></button>
+        </div>
+        <hr class="separator">
+        <!-- Row 3: Bookmark, History, Settings -->
+        <div class="row row3">
+          <button id="bookmarkBtn"><i data-feather="bookmark" style="stroke: cyan;"></i></button>
+          <button id="historyBtn"><i data-feather="clock" style="stroke: cyan;"></i></button>
+          <button id="settingsBtn"><i data-feather="settings" style="stroke: cyan;"></i></button>
+        </div>
+        <!-- Row 4: Clipboard, Music, Screenshot -->
+        <div class="row row4">
+          <button id="clipboardBtn"><i data-feather="clipboard" style="stroke: cyan;"></i></button>
+          <button id="musicBtn"><i data-feather="music" style="stroke: cyan;"></i></button>
+          <button id="screenshotBtn"><i data-feather="camera" style="stroke: cyan;"></i></button>
+        </div>
+          <!-- Unhide Method Selection (in sidebar) -->
+          <div class="unhide-method">
+            <span>Unhide Method:</span>
+            <label>
+              <input type="radio" name="unhideMethod" value="arrow" checked>
+              Arrow Button
+            </label>
+            <label>
+              <input type="radio" name="unhideMethod" value="hover">
+              Mouse Hover
+            </label>
+          </div>
+
+        <hr class="separator">
+        <!-- Bottom Buttons: New Tab and Hide Sidebar -->
+        <div class="bottom-buttons">
+          <button id="newTabBtn">
+            <i data-feather="plus" style="stroke: cyan;"></i> 
+            <span>New Tab</span>
+          </button>
+          
+          <button id="hideSidebarBtn"><i data-feather="sidebar" style="stroke: cyan;"></i></button>
+        </div>
+      </div>
+      <!-- Tabs Section -->
+      <div id="tabsSection">
+        <!-- Tabs will be inserted here -->
+      </div>
+    </div>
+    <!-- Webview Container -->
+    <div id="webview-container">
+      <div id="hover-zone"></div>
+      <div id="sidebar-toggle-arrow">&#9654;</div>
+      <webview id="webview" src="https://www.google.com" preload="preload.js"></webview>
+    </div>
+  </div>
+  <div id="moreFlyout" class="flyout">
+    <div class="flyout-content">
+      <!-- User Info Header -->
+      <button class="flyout-user" disabled>
+        <div class="user-info">
+          <img src="assets/user.png" alt="User" class="user-picture">
+          <div class="user-text">
+            <div class="username">Placeholder</div>
+            <div class="account-type">Local Account</div>
+          </div>
+        </div>
+      </button>
+      <hr class="flyout-separator">
+      <!-- New Tab, New Window, New Private -->
+      <button class="flyout-btn" id="flyoutNewTab">New Tab</button>
+      <button class="flyout-btn" id="flyoutNewWindow">New Window</button>
+      <button class="flyout-btn" id="flyoutNewPrivate">New Private</button>
+      <hr class="flyout-separator">
+      <!-- Pages: History, Downloads, Favorites -->
+      <button class="flyout-btn" id="flyoutHistory">History</button>
+      <button class="flyout-btn" id="flyoutDownloads">Downloads</button>
+      <button class="flyout-btn" id="flyoutFavorites">Favorites</button>
+      <hr class="flyout-separator">
+      <!-- Tools: Print, Full Screen, Share -->
+      <button class="flyout-btn" id="flyoutPrint">Print</button>
+      <button class="flyout-btn" id="flyoutFullScreen">Full Screen</button>
+      <button class="flyout-btn" id="flyoutShare">Share</button>
+      <hr class="flyout-separator">
+      <!-- Overige: Dev Tools, Settings -->
+      <button class="flyout-btn" id="flyoutDevTools">Dev Tools</button>
+      <button class="flyout-btn" id="flyoutSettings">Settings</button>
+    </div>
+  </div>
+
+  <script>
+
+let draggedTabId = null;
+let dragStartIndex = 0;
+    // Initialize Feather icons after DOM loads.
+    document.addEventListener("DOMContentLoaded", () => {
+      feather.replace();
+    });
+
+    const { ipcRenderer } = require('electron');
+    let selectedSearchEngine = "Google"; // Global search engine setting
+
+    let currentWindowState = 'restored';
+    ipcRenderer.on('window-state', (event, state) => {
+      currentWindowState = state;
+      const maximizeBtn = document.getElementById('maximizeBtn');
+      if (state === 'fullscreen') {
+        maximizeBtn.innerHTML = '<i data-feather="minimize" style="stroke: cyan;"></i>';
+      } else {
+        maximizeBtn.innerHTML = '<i data-feather="maximize" style="stroke: cyan;"></i>';
+      }
+      feather.replace();
+    });
+
+    document.getElementById('minimizeBtn').addEventListener('click', () => {
+      ipcRenderer.send('window-control', 'minimize');
+    });
+    document.getElementById('maximizeBtn').addEventListener('click', () => {
+      ipcRenderer.send('window-control', 'toggle-fullscreen');
+    });
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      ipcRenderer.send('window-control', 'close');
+    });
+
+    // Exit fullscreen on titlebar drag.
+    document.getElementById('titlebar').addEventListener('mousedown', () => {
+      if (currentWindowState === 'fullscreen') {
+        ipcRenderer.send('window-control', 'exit-fullscreen');
+      }
+    });
+
+    const webview = document.getElementById('webview');
+    const addressBar = document.getElementById('addressBar');
+    const homeBtn = document.getElementById('homeBtn');
+    const backBtn = document.getElementById('backBtn');
+    const forwardBtn = document.getElementById('forwardBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
+    const moreBtn = document.getElementById('moreBtn');
+    const newTabBtn = document.getElementById('newTabBtn');
+    const hideSidebarBtn = document.getElementById('hideSidebarBtn');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const sidebar = document.getElementById('sidebar');
+    const tabsSection = document.getElementById('tabsSection');
+    const sidebarToggleArrow = document.getElementById('sidebar-toggle-arrow');
+    const hoverZone = document.getElementById('hover-zone');
+    const unhideMethodRadios = document.getElementsByName('unhideMethod');
+
+    const homePage = `file://${__dirname}/homepage.html`;
+    let tabs = [];
+    let currentTabId = null;
+    let tabIdCounter = 1;
+    let unhideMethod = 'arrow';
+    let recentlyHidden = false;
+
+
+    // Toggle flyout visibility when More button is clicked
+ // Unified close function
+// Unified close function
+function closeFlyout() {
+  const flyout = document.getElementById('moreFlyout');
+  const moreBtn = document.getElementById('moreBtn');
+  
+  flyout.classList.remove('show');
+  moreBtn.classList.remove('active');
+  
+  setTimeout(() => {
+    flyout.style.display = 'none';
+    flyout.style.animation = '';
+  }, 200); // Match animation duration
+}
+
+// More Button Handler
+document.getElementById('moreBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const flyout = document.getElementById('moreFlyout');
+  const isVisible = flyout.style.display === 'block';
+
+  // Toggle visibility
+  if (isVisible) {
+    closeFlyout();
+  } else {
+    flyout.style.display = 'block';
+    flyout.style.animation = 'flyoutEntrance 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    setTimeout(() => {
+      flyout.classList.add('show');
+      moreBtn.classList.add('active');
+    }, 10);
+  }
+});
+
+// Click Outside Handler (Enhanced)
+document.addEventListener('mousedown', (e) => {
+  const flyout = document.getElementById('moreFlyout');
+  const moreBtn = document.getElementById('moreBtn');
+  
+  // Close if clicking outside flyout and not the more button
+  if (!flyout.contains(e.target) && !moreBtn.contains(e.target)) {
+    closeFlyout();
+  }
+});
+
+// Handle webview clicks specifically
+document.getElementById('webview').addEventListener('dom-ready', () => {
+  const webview = document.getElementById('webview');
+  
+  // Forward clicks from webview content
+  webview.executeJavaScript(`
+    document.addEventListener('click', () => {
+      window.ipcRenderer.send('webview-click');
+    });
+  `);
+});
+
+// Handle titlebar clicks
+document.getElementById('titlebar').addEventListener('mousedown', closeFlyout);
+
+// Handle IPC messages from webview
+ipcRenderer.on('webview-click', closeFlyout);
+
+// Escape key handler
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeFlyout();
+});
+// History button
+document.getElementById('flyoutHistory').addEventListener('click', () => {
+  loadURLInCurrentTab('file://' + __dirname + '/history.html');
+  document.getElementById('moreFlyout').style.display = 'none';
+});
+
+// Downloads button
+document.getElementById('flyoutDownloads').addEventListener('click', () => {
+  loadURLInCurrentTab('file://' + __dirname + '/downloads.html');
+  document.getElementById('moreFlyout').style.display = 'none';
+});
+
+// Favorites button
+document.getElementById('flyoutFavorites').addEventListener('click', () => {
+  loadURLInCurrentTab('file://' + __dirname + '/favorites.html');
+  document.getElementById('moreFlyout').style.display = 'none';
+});
+
+// Print button
+document.getElementById('flyoutPrint').addEventListener('click', () => {
+  ipcRenderer.send('window-control', 'print');
+  document.getElementById('moreFlyout').style.display = 'none';
+});
+
+// Full Screen button
+document.getElementById('flyoutFullScreen').addEventListener('click', () => {
+  ipcRenderer.send('window-control', 'toggle-fullscreen');
+  document.getElementById('moreFlyout').style.display = 'none';
+});
+
+// Share button
+document.getElementById('flyoutShare').addEventListener('click', () => {
+  ipcRenderer.send('window-control', 'share');
+  document.getElementById('moreFlyout').style.display = 'none';
+});
+
+// Dev Tools button
+document.getElementById('flyoutDevTools').addEventListener('click', () => {
+  ipcRenderer.send('window-control', 'devtools');
+  document.getElementById('moreFlyout').style.display = 'none';
+});
+
+// Settings button
+document.getElementById('flyoutSettings').addEventListener('click', () => {
+  const settingsPath = `file://${__dirname}/settings.html`;
+  createNewTab(settingsPath);
+  document.getElementById('moreFlyout').style.display = 'none';
+});
+
+
+
+
+    // Shared function: update unhide method based on current global variable
+    function updateUnhideMethod() {
+      for (const radio of unhideMethodRadios) {
+        radio.checked = (radio.value === unhideMethod);
+      }
+      if (unhideMethod === 'arrow') {
+        sidebar.classList.add('arrow-visible');
+        hoverZone.style.pointerEvents = 'none';
+      } else {
+        sidebar.classList.remove('arrow-visible');
+        hoverZone.style.pointerEvents = 'auto';
+      }
+    }
+    for (const radio of unhideMethodRadios) {
+      radio.addEventListener('change', () => {
+        unhideMethod = radio.value;
+        updateUnhideMethod();
+      });
+    }
+    updateUnhideMethod();
+
+    backBtn.addEventListener('click', () => {
+      if (webview.canGoBack()) webview.goBack();
+    });
+    forwardBtn.addEventListener('click', () => {
+      if (webview.canGoForward()) webview.goForward();
+    });
+    reloadBtn.addEventListener('click', () => {
+      webview.reload();
+    });
+    homeBtn.addEventListener('click', () => { loadURLInCurrentTab(homePage); });
+
+    // Listen for Enter key in the search bar and use the selected search engine
+    addressBar.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        let url = addressBar.value.trim();
+        if (!url) return;
+        if (!url.startsWith('http')) {
+          let query = encodeURIComponent(url);
+          if (selectedSearchEngine === 'Google') {
+            url = 'https://www.google.com/search?q=' + query;
+          } else if (selectedSearchEngine === 'Bing') {
+            url = 'https://www.bing.com/search?q=' + query;
+          } else if (selectedSearchEngine === 'DuckDuckGo') {
+            url = 'https://duckduckgo.com/?q=' + query;
+          }
+        }
+        loadURLInCurrentTab(url);
+      }
+    });
+
+    // Update address bar when navigation occurs
+    webview.addEventListener('did-navigate', (e) => {
+      addressBar.value = e.url;
+      if (currentTabId !== null) {
+        const tab = tabs.find(t => t.id === currentTabId);
+        if (tab) {
+          tab.url = e.url;
+          renderTabs();
+        }
+      }
+    });
+
+    // Listen for page title updates to update the tab title dynamically
+    webview.addEventListener('page-title-updated', (e) => {
+      if (currentTabId !== null) {
+        const tab = tabs.find(t => t.id === currentTabId);
+        if (tab) {
+          tab.title = e.title || tab.url;
+          renderTabs();
+        }
+      }
+    });
+
+    // Listen for favicon updates and update the tab object with the favicon URL
+    webview.addEventListener('page-favicon-updated', (e) => {
+      if (currentTabId !== null && e.favicons && e.favicons.length > 0) {
+        const tab = tabs.find(t => t.id === currentTabId);
+        if (tab) {
+          tab.favicon = e.favicons[0];
+          renderTabs();
+        }
+      }
+    });
+
+    // Listen for messages from the webview (for settings updates)
+    webview.addEventListener('ipc-message', (event) => {
+      if (event.channel === 'update-settings') {
+        const settings = event.args[0];
+        unhideMethod = settings.unhideMethod;
+        selectedSearchEngine = settings.searchEngine;
+        updateUnhideMethod();
+        console.log("Settings updated:", settings);
+      }
+    });
+
+    function hideSidebar() {
+      sidebar.classList.add('hidden');
+      recentlyHidden = true;
+      setTimeout(() => { recentlyHidden = false; }, 500);
+    }
+    function showSidebar() {
+      sidebar.classList.remove('hidden');
+    }
+    hideSidebarBtn.addEventListener('click', () => {
+      hideSidebar();
+    });
+    sidebarToggleArrow.addEventListener('click', () => {
+      if (sidebar.classList.contains('hidden')) showSidebar();
+    });
+    hoverZone.addEventListener('mouseenter', () => {
+      if (unhideMethod === 'hover' && sidebar.classList.contains('hidden') && !recentlyHidden) {
+        showSidebar();
+      }
+    });
+
+
+    document.getElementById('musicBtn').addEventListener('click', () => {
+    const musicPath = `file://${__dirname}/music.html`;
+    createNewTab(musicPath);
+});
+
+
+    // When Settings button is clicked, open a new tab with the settings page
+    settingsBtn.addEventListener('click', () => {
+      const settingsPath = `file://${__dirname}/settings.html`;
+      createNewTab(settingsPath);
+    });
+
+    function createNewTab(url = homePage) {
+      const newTab = {
+        id: tabIdCounter++,
+        title: "New Tab",
+        url: url,
+        favicon: ''
+      };
+      if (url.includes("settings.html")) {
+        newTab.title = "Settings";
+      }
+      if(url.includes("music.html")) {
+    newTab.title = "Music Player";
+    const webview = document.createElement('webview');
+    webview.src = url;
+    webview.preload = `file://${__dirname}/preload.js`;
+    webview.allowpopups = true;
+    webview.webpreferences = 'nodeIntegration=no, contextIsolation=yes';
+  }
+      tabs.push(newTab);
+      currentTabId = newTab.id;
+      renderTabs();
+      loadURLInCurrentTab(url);
+    }
+    function loadURLInCurrentTab(url) {
+      if (currentTabId === null) {
+        createNewTab(url);
+      } else {
+        const tab = tabs.find(t => t.id === currentTabId);
+        if (tab) {
+          tab.url = url;
+          webview.loadURL(url);
+        }
+      }
+    }
+    function switchToTab(tabId) {
+      currentTabId = tabId;
+      const tab = tabs.find(t => t.id === tabId);
+      if (tab) {
+        webview.loadURL(tab.url);
+        addressBar.value = tab.url;
+        renderTabs();
+      }
+    }
+    function closeTab(tabId) {
+      tabs = tabs.filter(t => t.id !== tabId);
+      if (currentTabId === tabId) {
+        if (tabs.length > 0) {
+          currentTabId = tabs[tabs.length - 1].id;
+          switchToTab(currentTabId);
+        } else {
+          currentTabId = null;
+          webview.loadURL(homePage);
+          addressBar.value = homePage;
+        }
+      }
+      renderTabs();
+    }
+    function renderTabs() {
+  tabsSection.innerHTML = '';
+  tabs.forEach(tab => {
+    const tabDiv = document.createElement('div');
+    tabDiv.classList.add('tab-item');
+    tabDiv.draggable = true;
+    tabDiv.dataset.tabId = tab.id;
+    
+    // Drag and Drop Events
+    tabDiv.addEventListener('dragstart', handleDragStart);
+    tabDiv.addEventListener('dragover', handleDragOver);
+    tabDiv.addEventListener('dragleave', handleDragLeave);
+    tabDiv.addEventListener('dragend', handleDragEnd);
+    tabDiv.addEventListener('drop', handleDrop);
+        if (tab.id === currentTabId) tabDiv.classList.add('active');
+        
+        if (tab.favicon) {
+          const faviconImg = document.createElement('img');
+          faviconImg.src = tab.favicon;
+          faviconImg.alt = "icon";
+          faviconImg.classList.add("favicon");
+          tabDiv.appendChild(faviconImg);
+        }
+        
+        const titleSpan = document.createElement('span');
+        titleSpan.classList.add('tab-title');
+        titleSpan.textContent = tab.title;
+        const closeSpan = document.createElement('span');
+        closeSpan.classList.add('tab-close');
+        closeSpan.textContent = '×';
+        closeSpan.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeTab(tab.id);
+        });
+        tabDiv.appendChild(titleSpan);
+        tabDiv.appendChild(closeSpan);
+        tabDiv.addEventListener('click', () => {
+          switchToTab(tab.id);
+        });
+        tabsSection.appendChild(tabDiv);
+        tabDiv.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+      });
+    }
+
+    function handleDragStart(e) {
+  draggedTabId = parseInt(this.dataset.tabId);
+  dragStartIndex = tabs.findIndex(t => t.id === draggedTabId);
+  this.classList.add('dragging');
+  e.dataTransfer.setData('text/plain', draggedTabId.toString());
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  const currentTabId = parseInt(this.dataset.tabId);
+  if (currentTabId === draggedTabId) return;
+
+  const rect = this.getBoundingClientRect();
+  const offsetY = e.clientY - rect.top;
+  const isBefore = offsetY < rect.height / 2;
+
+  this.classList.toggle('drag-over-top', isBefore);
+  this.classList.toggle('drag-over-bottom', !isBefore);
+}
+
+function handleDragLeave() {
+  this.classList.remove('drag-over-top', 'drag-over-bottom');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  const targetTabId = parseInt(this.dataset.tabId);
+  const targetIndex = tabs.findIndex(t => t.id === targetTabId);
+  const rect = this.getBoundingClientRect();
+  const isBefore = e.clientY < rect.top + rect.height / 2;
+
+  // Perform the swap
+  const draggedTab = tabs.find(t => t.id === draggedTabId);
+  const newIndex = isBefore ? targetIndex : targetIndex + 1;
+  
+  // Remove from old position
+  tabs.splice(dragStartIndex, 1);
+  // Insert at new position
+  tabs.splice(newIndex, 0, draggedTab);
+  
+  renderTabs();
+}
+
+function handleDragEnd() {
+  this.classList.remove('dragging', 'drag-over-top', 'drag-over-bottom');
+  draggedTabId = null;
+  dragStartIndex = 0;
+}
+
+    newTabBtn.addEventListener('click', () => {
+      createNewTab();
+    });
+
+    createNewTab();
+  </script>
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    video {
+        width: 250vw;
+      height: 240vh;
+    }
+  </style>
+</head>
+<body>
+  <video id="introVideo" autoplay muted>
+    <source src="assets/gridintro.mp4" type="video/mp4">
+  </video>
+
+  <script>
+    const video = document.getElementById('introVideo');
+    
+    video.addEventListener('ended', () => {
+      require('electron').ipcRenderer.send('splash-complete');
+    });
+
+    // Optional: Force video duration to 4.5 seconds
+    video.addEventListener('timeupdate', () => {
+      if (video.currentTime >= 4.5) {
+        video.pause();
+        require('electron').ipcRenderer.send('splash-complete');
+      }
+    });
+  </script>
+</body>
+</html>

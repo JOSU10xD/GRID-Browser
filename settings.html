@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Settings - GRID Browser</title>
+  <style>
+    /* Global resets and body styling */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: url('assets/wallpaper2.png') no-repeat center center;
+      background-size: cover;
+      color: #fff;
+      overflow: hidden;
+      transition: opacity 0.5s ease-out;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    /* Fieldset styling for a more organized look */
+    fieldset {
+      margin-bottom: 20px;
+      border: 1px solid #555;
+      padding: 15px 20px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.8);
+    }
+    legend {
+      font-weight: bold;
+      padding: 0 10px;
+      font-size: 20px;
+    }
+    /* Label and input styling */
+    label {
+      display: block;
+      margin: 10px 0;
+      font-size: 18px;
+    }
+    select,
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 5px;
+      border: 1px solid #777;
+      border-radius: 4px;
+      background: #222;
+      color: #fff;
+    }
+    input[type="file"] {
+      margin-top: 5px;
+      color: #fff;
+    }
+    /* Button styling for a classy look */
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      background-color: #0078d7; /* Blue tone */
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      display: block;
+      margin: 0 auto;
+      margin-top: 30px;
+    }
+    button:hover {
+      background-color: #005a9e;
+      transform: translateY(-2px);
+    }
+    /* Responsive centering of the form */
+    #settingsForm {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body style="background-color: #000;">
+  <h1>Settings</h1>
+  <form id="settingsForm">
+    <fieldset>
+      <legend>Unhide Method</legend>
+      <label>
+        <input type="radio" name="unhideMethod" value="arrow" checked>
+        Arrow Button
+      </label>
+      <label>
+        <input type="radio" name="unhideMethod" value="hover">
+        Mouse Hover
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Search Engine</legend>
+      <label>
+        <select name="searchEngine" id="searchEngine">
+          <option value="Google" selected>Google</option>
+          <option value="Bing">Bing</option>
+          <option value="DuckDuckGo">DuckDuckGo</option>
+        </select>
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Custom Wallpaper</legend>
+      <label>
+        Select Wallpaper:
+        <input type="file" id="wallpaperInput" accept="image/*">
+      </label>
+    </fieldset>
+    <button type="button" id="saveBtn">Save Settings</button>
+  </form>
+  <script>
+    const { ipcRenderer } = require('electron');
+    const radios = document.getElementsByName('unhideMethod');
+    const searchEngineSelect = document.getElementById('searchEngine');
+    const wallpaperInput = document.getElementById('wallpaperInput');
+
+    // Function to send updated settings to main process
+    function sendSettings() {
+      const unhideMethod = document.querySelector('input[name="unhideMethod"]:checked').value;
+      const searchEngine = searchEngineSelect.value;
+      ipcRenderer.send('update-settings', { unhideMethod, searchEngine });
+    }
+
+    // Attach events for unhide and search engine fields
+    for (const radio of radios) {
+      radio.addEventListener('change', sendSettings);
+    }
+    searchEngineSelect.addEventListener('change', sendSettings);
+
+    // Handle wallpaper file selection – read as Base64 and store persistently (e.g., in localStorage)
+    wallpaperInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          // Store the Base64 image data persistently so that the homepage can load it
+          localStorage.setItem('wallpaper', event.target.result);
+          alert("Wallpaper updated! It will be applied on your homepage.");
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Save settings when "Save Settings" is clicked
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      sendSettings();
+      alert("Settings saved!");
+    });
+  </script>
+</body>
+</html>

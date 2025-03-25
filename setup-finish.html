@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Finishing Setup - GRID Browser</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 20px;
+      height: 100%;
+      overflow: hidden;  /* This removes scrollbars */
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .title-bar {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      margin-bottom: 20px;
+    }
+    .title-bar img {
+      height: 32px;
+      width: 32px;
+      margin-right: 10px;
+    }
+    .title-bar span {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .content {
+      text-align: center;
+    }
+    .content p {
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+    .progress {
+      width: 150px;
+      height: 20px;
+      background: #555;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: #fff;
+      border-radius: 10px;
+      animation: progress 3s ease-out forwards;
+    }
+    @keyframes progress {
+      0% { width: 0; }
+      100% { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="title-bar">
+    <img src="assets/gridlogo.png" alt="Done Icon">
+    <span>Finishing SETTINGS</span>
+  </div>
+  <div class="content">
+    <p>Please Wait</p>
+    <div class="progress">
+      <div class="progress-bar"></div>
+    </div>
+  </div>
+  <script>
+    // After the progress animation ends, send finish-setup message
+    setTimeout(() => {
+      const { ipcRenderer } = require('electron');
+      ipcRenderer.send('finish-setup');
+    }, 3000);
+  </script>
+</body>
+</html>

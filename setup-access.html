@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Accessibility Settings - GRID Browser</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 20px;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+    }
+    .title-bar {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      margin-bottom: 20px;
+    }
+    .title-bar img {
+      height: 32px;
+      margin-right: 10px;
+    }
+    .title-bar span {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .setting {
+      margin-bottom: 15px;
+    }
+    .setting label {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    .setting input[type="checkbox"],
+    .setting select {
+      font-size: 18px;
+      margin-left: 10px;
+    }
+    .btn {
+      padding: 8px 16px;
+      font-size: 18px;
+      border: none;
+      border-radius: 4px;
+      background: #353535;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .btn:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div class="title-bar">
+      <img src="assets/gridlogo.png" alt="Access Icon">
+      <span>Accessibility Settings</span>
+    </div>
+    <div class="setting">
+      <label for="lightMode">FireBrowser - Light Mode:</label>
+      <input type="checkbox" id="lightMode">
+    </div>
+    <div class="setting">
+      <label for="langSelect">FireBrowser - SpeakEngine:</label>
+      <select id="langSelect">
+        <option value="en-US" selected>en-US</option>
+        <option value="nl-NL">nl-NL</option>
+      </select>
+    </div>
+    <button class="btn" id="accessNextBtn">Setup Access</button>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    function updateAccessSettings() {
+      const lightMode = document.getElementById('lightMode').checked ? "1" : "0";
+      const lang = document.getElementById('langSelect').value;
+      const accessSettings = { lightMode, lang };
+      ipcRenderer.send('update-access-settings', accessSettings);
+    }
+    document.getElementById('accessNextBtn').addEventListener('click', () => {
+      updateAccessSettings();
+      document.body.style.opacity = 0;
+      setTimeout(() => {
+        window.location.href = "setup-webview.html";
+      }, 500);
+    });
+  </script>
+</body>
+</html>

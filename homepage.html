@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html style="background-color: #000;">
+<head>
+  <meta charset="UTF-8">
+  <title>Custom Homepage - GRID Browser</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      transition: opacity 0.5s ease-out;
+    }
+    .container {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-size: cover;
+      z-index: 1;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0,0,0,0.3);
+      padding: 20px;
+    }
+    .time-date {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .time-date .time {
+      font-size: 48px;
+      font-weight: bold;
+    }
+    .time-date .date {
+      font-size: 24px;
+    }
+    .search-box {
+      width: 100%;
+      max-width: 600px;
+    }
+    .search-box input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 20px;
+      border: none;
+      border-radius: 4px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.3), /* Inner cyan border */
+        0 0 10px rgba(0, 255, 255, 0.5),   /* Outer glow */
+        inset 0 0 5px rgba(0, 255, 255, 0.2); /* Inner glow */
+    transition: all 0.3s ease;
+    outline: none;
+    }
+
+    .search-box input[type="text"] :hover{
+      box-shadow: 
+        0 0 0 1px rgba(0, 255, 255, 0.5),
+        0 0 15px rgba(0, 255, 255, 0.7),
+        inset 0 0 8px rgba(0, 255, 255, 0.3);
+    }
+
+    .search-box input[type="text"] :focus{
+      background-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 
+        0 0 0 2px rgba(0, 255, 255, 0.8),
+        0 0 20px rgba(0, 255, 255, 1),
+        inset 0 0 10px rgba(0, 255, 255, 0.4);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="background" id="bgImage"></div>
+    <div class="overlay">
+      <div class="time-date">
+        <div class="time" id="timeDisplay">--:--:--</div>
+        <div class="date" id="dateDisplay">Loading date...</div>
+      </div>
+      <div class="search-box">
+        <input type="text" id="homepageSearch" placeholder="Search or enter URL">
+      </div>
+    </div>
+  </div>
+  <script>
+    // Update time and date
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('timeDisplay').textContent = now.toLocaleTimeString();
+      document.getElementById('dateDisplay').textContent = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+
+    // Load wallpaper from stored setting or default
+    function loadWallpaper() {
+      const wallpaper = localStorage.getItem('wallpaper') || 'assets/wallpaper.jpg';
+      document.getElementById('bgImage').style.backgroundImage = `url('${wallpaper}')`;
+    }
+    loadWallpaper();
+
+    // Search functionality: load URL in current tab
+    const homepageSearch = document.getElementById('homepageSearch');
+    homepageSearch.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        let query = homepageSearch.value.trim();
+        if (!query) return;
+        if (!query.startsWith('http://') && !query.startsWith('https://')) {
+          query = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+        }
+        window.location.href = query;
+      }
+    });
+  </script>
+</body>
+</html>

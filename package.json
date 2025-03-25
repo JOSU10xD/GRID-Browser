@@ -1,0 +1,21 @@
+{
+  "name": "grid-browser",
+  "version": "1.0.0",
+  "description": "GRID Browser - a Chromium-based browser with a sidebar UI inspired by Zen Browser",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "latest",
+    "feather-icons": "^4.29.2"
+  },
+  "build": {
+    "productName": "GRID",
+    "appId": "com.yourdomain.grid",
+    "icon": "assets/gridlogo.png"
+  },
+  "dependencies": {
+    "three": "^0.174.0"
+  }
+}

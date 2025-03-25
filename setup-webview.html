@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>WebView Settings - GRID Browser</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+    }
+    .container {
+      padding: 20px;
+    }
+    .title-bar {
+      display: flex;
+      align-items: center;
+      height: 48px;
+      margin-bottom: 20px;
+    }
+    .title-bar img {
+      height: 32px;
+      width: 32px;
+      margin-right: 10px;
+    }
+    .title-bar span {
+      font-size: 24px;
+    }
+    .setting {
+      margin-bottom: 15px;
+    }
+    .setting label {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    .setting input[type="checkbox"] {
+      transform: scale(1.3);
+      margin-left: 10px;
+    }
+    .setting input[type="text"] {
+      padding: 5px;
+      font-size: 16px;
+      width: 100%;
+      margin-top: 5px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #222;
+      color: #fff;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 18px;
+      border: none;
+      border-radius: 4px;
+      background: #353535;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Title Bar -->
+    <div class="title-bar">
+      <img src="assets/Webset.png" alt="WebView Icon">
+      <span>WebView SETTINGS</span>
+    </div>
+    <!-- Settings Content -->
+    <div class="setting">
+      <label for="statusTog">WebView2 StatusBar:</label>
+      <input type="checkbox" id="statusTog" checked>
+    </div>
+    <div class="setting">
+      <label for="browserKeys">WebView2 Accelerator Keys:</label>
+      <input type="checkbox" id="browserKeys" checked>
+    </div>
+    <div class="setting">
+      <label for="browserScripts">WebView2 Script Dialogs:</label>
+      <input type="checkbox" id="browserScripts" checked>
+    </div>
+    <div class="setting">
+      <label for="userAgent">UserAgent:</label>
+      <input type="text" id="userAgent" value="FireBrowserWebView">
+    </div>
+    <button id="setupWebViewBtn">Setup WebView</button>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    function updateWebViewSettings() {
+      const webviewSettings = {
+        statusBar: document.getElementById('statusTog').checked ? "1" : "0",
+        browserKeys: document.getElementById('browserKeys').checked ? "1" : "0",
+        browserScripts: document.getElementById('browserScripts').checked ? "1" : "0",
+        userAgent: document.getElementById('userAgent').value
+      };
+      ipcRenderer.send('update-webview-settings', webviewSettings);
+    }
+    document.getElementById('setupWebViewBtn').addEventListener('click', () => {
+      updateWebViewSettings();
+      document.body.style.opacity = 0;
+      setTimeout(() => {
+        window.location.href = "setup-finish.html";
+      }, 500);
+    });
+  </script>
+</body>
+</html>

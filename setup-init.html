@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Setup - GRID Browser</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow: hidden;
+    }
+    .container {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+    .background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('assets/animated_background.gif') no-repeat center center;
+      background-size: cover;
+      z-index: 1;
+    }
+    .overlay {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .title-bar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      -webkit-app-region: drag;
+    }
+    .title-bar img {
+      height: 36px;
+      margin-right: 10px;
+    }
+    .title-bar span {
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .setup-box {
+      background: rgba(0,0,0,0.7);
+      padding: 20px;
+      border-radius: 10px;
+      min-width: 400px;
+      text-align: center;
+    }
+    .setup-box h1 {
+      font-size: 35px;
+      margin-bottom: 15px;
+    }
+    .setup-box p {
+      font-size: 18px;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .setup-box button {
+      padding: 10px 20px;
+      font-size: 20px;
+      border: none;
+      border-radius: 4px;
+      background: #353535;
+      color: #fff;
+      cursor: pointer;
+    }
+    .setup-box button:hover {
+      background: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="background"></div>
+    <div class="overlay">
+      <!-- Title Bar -->
+      <div class="title-bar">
+        <img src="assets/gridlogo.png" alt="Logo">
+        <span>GRID&nbsp;<span style="font-weight:300; font-size:26px;">ALPHA</span></span>
+      </div>
+      <!-- Main Content -->
+      <div class="content">
+        <div class="setup-box">
+          <h1>Welcome to GRID Browser</h1>
+          <p>
+            Seamless browsing experience.<br>
+            One-click access to favorite websites.<br>
+            Immersive full-screen mode.
+          </p>
+          <button id="setupBtn">Setup your Browser</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    document.getElementById('setupBtn').addEventListener('click', () => {
+      // Notify main process to navigate to the registration page.
+      ipcRenderer.send('navigate-setup-user');
+    });
+  </script>
+</body>
+</html>
