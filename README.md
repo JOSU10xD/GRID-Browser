@@ -13,9 +13,9 @@
 <!-- Replace these with your 4–5 images -->
 
 ![Home Page](Screenshot%202025-03-31%20032323.png)
-![Main View](Screenshot%2025-03-31%034840.png)
-![Settings](Screenshot%2025-04-01%022625.png)
-![Music Section](Screenshot%2025-03-31%035028.png)
+![Main View](Screenshot%202025-03-31%20034840.png)
+![Settings](Screenshot%202025-04-01%20022625.png)
+![Music Section](Screenshot%202025-03-31%20035028.png)
 
 ---
 
