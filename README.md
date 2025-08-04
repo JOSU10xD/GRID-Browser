@@ -1,9 +1,10 @@
-#  GRID Browser  
+````markdown
+# 🔳 GRID Browser  
 
 ![GRID Browser Banner](./assets/grid-banner.png)  
 
 ## 🚀 Overview  
-**GRID Browser** is a lightweight, customizable desktop browser built with **Electron**, **HTML**, **CSS**, and **JavaScript**. It features a minimal UI, built-in settings page, and a home screen—perfect for learning how to build a Chromium-powered shell or as a foundation for your own custom browser project.  
+**GRID Browser** is a lightweight, customizable desktop browser built with **Electron**, **HTML**, **CSS**, and **JavaScript**. It features a minimal UI, a built-in settings page, and a custom home screen—perfect for learning how to build a Chromium-powered shell or as a foundation for your own browser project.
 
 ---
 
@@ -19,28 +20,28 @@
 
 ## 🏗️ Tech Stack  
 
-- **[Electron](https://www.electronjs.org/)** – Cross-platform desktop runtime.  
-- **HTML5 & CSS3** – Markup and styling for UI.  
-- **Vanilla JavaScript** – Browser logic and event handling.  
-- **Node.js** – Backend support for file and settings management.  
+- **[Electron](https://www.electronjs.org/)** – Cross-platform desktop runtime  
+- **HTML5 & CSS3** – Markup and styling  
+- **Vanilla JavaScript** – Browser logic and event handling  
+- **Node.js** – Backend support for file and settings management  
 
 ---
 
 ## 🔥 Features  
 
 ### ✅ Core Features  
-- **Tabbed Browsing** – Open multiple pages in separate tabs.  
-- **Custom Homepage** – Configurable start page via `homepage.html`.  
-- **Settings Panel** – Manage preferences (theme, default URL) in `settings.html`.  
-- **Navigation Controls** – Back/Forward, Reload, and Address Bar.  
-- **Lightweight** – Minimal dependencies for fast startup.  
+- **Tabbed Browsing** – Open multiple pages in separate tabs  
+- **Custom Homepage** – Configurable start page via `homepage.html`  
+- **Settings Panel** – Manage preferences (theme, default URL) in `settings.html`  
+- **Navigation Controls** – Back/Forward, Reload, and Address Bar  
+- **Lightweight** – Minimal dependencies for fast startup  
 
 ### 🛠️ Planned Enhancements  
-- **Download Manager** – Handle file downloads natively.  
-- **Bookmark System** – Save and organize favorite sites.  
-- **History Viewer** – Browse and clear past visits.  
-- **Extension Support** – Experiment with simple plugin APIs.  
-- **Privacy Mode** – Incognito browsing without data persistence.  
+- **Download Manager** – Handle file downloads natively  
+- **Bookmark System** – Save and organize favorite sites  
+- **History Viewer** – Browse and clear past visits  
+- **Extension Support** – Experiment with simple plugin APIs  
+- **Privacy Mode** – Incognito browsing without data persistence  
 
 ---
 
@@ -57,6 +58,7 @@
    ```sh
    npm install
    ```
+
 3. **Run the app**
 
    ```sh
@@ -69,17 +71,17 @@
 
 ```bash
 GRID-Browser/
-│── assets/             
-│   ├── grid-banner.png       # Banner for README  
-│   ├── homepage.png          # Screenshot placeholders  
+│── assets/             # Images and icons
+│   ├── grid-banner.png       # README banner
+│   ├── homepage.png          # Screenshot placeholders
 │   └── …  
-│── index.html               # Main browser UI  
-│── homepage.html            # Customizable start page  
-│── settings.html            # Preferences panel  
-│── main.js                  # Electron main process  
-│── renderer.js              # Front-end logic (if used)  
-│── package.json             # Project manifest & scripts  
-└── .gitignore               
+│── index.html           # Main browser UI
+│── homepage.html        # Customizable start page
+│── settings.html        # Preferences panel
+│── main.js              # Electron main process
+│── renderer.js          # Front-end logic (if used)
+│── package.json         # Project manifest & scripts
+└── .gitignore
 ```
 
 ---
