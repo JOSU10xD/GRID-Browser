@@ -1,6 +1,6 @@
-# 🔳 GRID Browser
+# 🌐 GRID Browser
 
-![GRID Browser Banner](./assets/grid-banner.png)
+![GRID Browser Banner](gridlogo.png)
 
 ## 🚀 Overview
 
