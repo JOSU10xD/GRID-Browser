@@ -13,25 +13,25 @@
 ### Home Page
 
 <p align="center">
-  <img src="Screenshot%202025-03-31%20032323.png" width="400px" alt="Home Page">
+  <img src="Screenshot%202025-03-31%20032323.png" width="600px" alt="Home Page">
 </p>
 
 ### Main View
 
 <p align="center">
-  <img src="Screenshot%202025-03-31%20034840.png" width="400px" alt="Main View">
+  <img src="Screenshot%202025-03-31%20034840.png" width="600px" alt="Main View">
 </p>
 
 ### Settings
 
 <p align="center">
-  <img src="Screenshot%202025-04-01%20022625.png" width="400px" alt="Settings">
+  <img src="Screenshot%202025-04-01%20022625.png" width="600px" alt="Settings">
 </p>
 
 ### Music Section
 
 <p align="center">
-  <img src="Screenshot%202025-03-31%20035028.png" width="400px" alt="Music Section">
+  <img src="Screenshot%202025-03-31%20035028.png" width="600px" alt="Music Section">
 </p>
 
 ---
