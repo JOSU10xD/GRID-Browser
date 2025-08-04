@@ -1,6 +1,6 @@
 # 🌐 GRID Browser
 
-![GRID Browser Banner](gridlogo(300x300).png)
+![GRID Browser Banner](gridlogo\(300x300\).png)
 
 ## 🚀 Overview
 
@@ -10,12 +10,29 @@
 
 ## 📸 Screenshots
 
-<!-- Replace these with your 4–5 images -->
+### Home Page
 
-![Home Page](Screenshot%202025-03-31%20032323.png)
-![Main View](Screenshot%202025-03-31%20034840.png)
-![Settings](Screenshot%202025-04-01%20022625.png)
-![Music Section](Screenshot%202025-03-31%20035028.png)
+<p align="center">
+  <img src="Screenshot%202025-03-31%20032323.png" width="400px" alt="Home Page">
+</p>
+
+### Main View
+
+<p align="center">
+  <img src="Screenshot%202025-03-31%20034840.png" width="400px" alt="Main View">
+</p>
+
+### Settings
+
+<p align="center">
+  <img src="Screenshot%202025-04-01%20022625.png" width="400px" alt="Settings">
+</p>
+
+### Music Section
+
+<p align="center">
+  <img src="Screenshot%202025-03-31%20035028.png" width="400px" alt="Music Section">
+</p>
 
 ---
 
