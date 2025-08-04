@@ -12,10 +12,10 @@
 
 <!-- Replace these with your 4–5 images -->
 
-![Home Page](./assets/homepage.png)
-![Main View](./assets/index.png)
-![Settings](./assets/settings.png)
-![Context Menu](./assets/context-menu.png)
+![Home Page](Screenshot 2025-03-31 032323.png)
+![Main View](Screenshot 2025-03-31 034840.png)
+![Settings](Screenshot 2025-04-01 022625.png)
+![Music Section](Screenshot 2025-03-31 035028.png)
 
 ---
 
