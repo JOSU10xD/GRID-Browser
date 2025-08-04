@@ -1,6 +1,6 @@
 # 🌐 GRID Browser
 
-![GRID Browser Banner](gridlogo.png)
+![GRID Browser Banner](gridlogo(300x300).png)
 
 ## 🚀 Overview
 
